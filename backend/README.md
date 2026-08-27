@@ -112,6 +112,7 @@ A small browser tester is served at:
 
 ```text
 http://localhost:5000/
+http://localhost:5000/scanner
 ```
 
 ## Development Commands

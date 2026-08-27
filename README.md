@@ -52,7 +52,7 @@ The API runs at `http://localhost:5000` and exposes:
 
 Full frontend API contract: `backend/API.md`.
 
-A small backend-served tester is available at `http://localhost:5000/`.
+A small backend-served tester is available at `http://localhost:5000/` and `http://localhost:5000/scanner`.
 
 ## Root Convenience Scripts
 

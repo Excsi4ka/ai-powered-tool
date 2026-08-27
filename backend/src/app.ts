@@ -61,12 +61,30 @@ export const createApp = (options: CreateAppOptions = {}): express.Express => {
 
   app.use(express.static(publicPath, { index: false }));
 
+  app.get("/api", (_req, res) => {
+    res.json({
+      success: true,
+      app: "HireLens AI Backend",
+      tester: "/scanner",
+      endpoints: [
+        "GET /api/health",
+        "POST /api/analyses",
+        "GET /api/analyses",
+        "GET /api/analyses/:id",
+        "DELETE /api/analyses/:id",
+      ],
+    });
+  });
+
   app.use("/api/health", createHealthRouter());
   app.use("/api/analyses", createAnalysisRouter(options.analysisController));
 
-  app.get("/", (_req, res) => {
+  const sendTester = (_req: express.Request, res: express.Response): void => {
     res.sendFile(path.join(publicPath, "index.html"));
-  });
+  };
+
+  app.get("/", sendTester);
+  app.get(/^\/(?!api(?:\/|$)).*/, sendTester);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

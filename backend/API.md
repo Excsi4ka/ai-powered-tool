@@ -10,6 +10,7 @@ Quick browser tester:
 
 ```text
 http://localhost:5000/
+http://localhost:5000/scanner
 ```
 
 All responses use JSON. The Gemini API key is used only on the backend and is never returned to the frontend.
@@ -31,6 +32,10 @@ FRONTEND_ORIGIN=http://localhost:3000,http://localhost:5173
 Allowed methods: `GET`, `POST`, `DELETE`, `OPTIONS`.
 
 ## Endpoints
+
+### GET `/api`
+
+Returns a small API index with available endpoints and the quick tester path.
 
 ### GET `/api/health`
 
