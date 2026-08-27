@@ -20,13 +20,13 @@ All responses use JSON. The Gemini API key is used only on the backend and is ne
 Allowed frontend origin comes from:
 
 ```text
-FRONTEND_ORIGIN=http://localhost:3000
+FRONTEND_ORIGIN=http://localhost:3000,https://jobcheck.excsi.dev
 ```
 
-To connect a different React/Next.js frontend, update `FRONTEND_ORIGIN` in `backend/.env`, then restart the backend. Multiple local origins can be comma-separated:
+To connect a different React/Next.js frontend, update `FRONTEND_ORIGIN` in `backend/.env`, then restart the backend. Multiple origins can be comma-separated:
 
 ```text
-FRONTEND_ORIGIN=http://localhost:3000,http://localhost:5173
+FRONTEND_ORIGIN=http://localhost:3000,http://localhost:5173,https://jobcheck.excsi.dev
 ```
 
 Allowed methods: `GET`, `POST`, `DELETE`, `OPTIONS`.

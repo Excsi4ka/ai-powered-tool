@@ -27,7 +27,7 @@ Edit `backend/.env` with your real PostgreSQL password and Gemini key:
 DATABASE_URL=postgresql://postgres:YOUR_POSTGRES_PASSWORD@localhost:5432/hirelens
 DATABASE_SSL=false
 GEMINI_API_KEY=your_real_gemini_api_key
-FRONTEND_ORIGIN=http://localhost:3000
+FRONTEND_ORIGIN=http://localhost:3000,https://jobcheck.excsi.dev
 ```
 
 Create the database and schema:
@@ -80,14 +80,14 @@ The Docker setup now runs the HireLens backend plus PostgreSQL. Export your Gemi
 
 ```bash
 export GEMINI_API_KEY=your_real_gemini_api_key
-export FRONTEND_ORIGIN=http://localhost:3000
+export FRONTEND_ORIGIN=http://localhost:3000,https://jobcheck.excsi.dev
 ```
 
 On PowerShell:
 
 ```powershell
 $env:GEMINI_API_KEY="your_real_gemini_api_key"
-$env:FRONTEND_ORIGIN="http://localhost:3000"
+$env:FRONTEND_ORIGIN="http://localhost:3000,https://jobcheck.excsi.dev"
 ```
 
 Build and start the application:

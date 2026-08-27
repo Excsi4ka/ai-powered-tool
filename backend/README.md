@@ -55,7 +55,7 @@ DATABASE_URL=postgresql://postgres:password@localhost:5432/hirelens
 DATABASE_SSL=false
 GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-3.7-flash
-FRONTEND_ORIGIN=http://localhost:3000
+FRONTEND_ORIGIN=http://localhost:3000,https://jobcheck.excsi.dev
 NODE_ENV=development
 ```
 
