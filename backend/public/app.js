@@ -8,6 +8,8 @@ const fitLevel = document.querySelector("#fitLevel");
 const summary = document.querySelector("#summary");
 const resultJson = document.querySelector("#resultJson");
 const analysesList = document.querySelector("#analysesList");
+const jobUrlInput = document.querySelector("#jobUrl");
+const jobDescriptionInput = document.querySelector("#jobDescription");
 
 const escapeHtml = (value) =>
   String(value)
@@ -71,12 +73,14 @@ const loadAnalyses = async () => {
         const company = item.company ? ` at ${item.company}` : "";
         const filename = item.resumeFilename || "resume";
         const created = new Date(item.createdAt).toLocaleString();
+        const source = item.jobUrl ? `<span class="muted">${escapeHtml(item.jobUrl)}</span>` : "";
 
         return `
           <article class="analysis-row">
             <div>
               <strong>${escapeHtml(title)}${escapeHtml(company)}</strong>
-              <span class="muted">${escapeHtml(filename)} · ${escapeHtml(created)}</span>
+              <span class="muted">${escapeHtml(filename)} - ${escapeHtml(created)}</span>
+              ${source}
             </div>
             <div class="score">${escapeHtml(item.analysis.matchScore)}%</div>
           </article>
@@ -84,16 +88,25 @@ const loadAnalyses = async () => {
       })
       .join("");
   } catch (error) {
-    analysesList.innerHTML = `<div class="summary error">${error.message}</div>`;
+    analysesList.innerHTML = `<div class="summary error">${escapeHtml(error.message)}</div>`;
   }
 };
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+
+  if (!jobUrlInput.value.trim() && !jobDescriptionInput.value.trim()) {
+    requestStatus.textContent = "Missing job";
+    setGrade();
+    setSummary("Add a job posting URL or paste a job description.", "error");
+    setJson({});
+    return;
+  }
+
   requestStatus.textContent = "Running...";
   submitButton.disabled = true;
   setGrade();
-  setSummary("Sending resume and job description to the backend...", "empty");
+  setSummary("Sending resume and job input to the backend...", "empty");
   setJson({});
 
   const formData = new FormData(form);
@@ -114,7 +127,7 @@ form.addEventListener("submit", async (event) => {
     const analysis = data.data.analysis;
     requestStatus.textContent = "Complete";
     setGrade(analysis.matchScore, analysis.matchLevel);
-    setSummary(`${analysis.matchScore}% estimated compatibility · ${analysis.summary}`, "");
+    setSummary(`${analysis.matchScore}% estimated compatibility - ${analysis.summary}`, "");
     await loadAnalyses();
   } catch (error) {
     requestStatus.textContent = "Failed";

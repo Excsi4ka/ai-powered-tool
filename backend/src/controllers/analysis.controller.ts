@@ -25,6 +25,7 @@ export class AnalysisController {
       result = await this.service.createAnalysis({
         resumeFile: req.file,
         jobDescription: body.jobDescription,
+        jobUrl: body.jobUrl,
         jobTitle: body.jobTitle,
         company: body.company,
       });

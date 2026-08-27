@@ -54,7 +54,7 @@ PORT=5000
 DATABASE_URL=postgresql://postgres:password@localhost:5432/hirelens
 DATABASE_SSL=false
 GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-3.7-flash
+GEMINI_MODEL=gemini-3.6-flash
 FRONTEND_ORIGIN=http://localhost:3000,https://jobcheck.excsi.dev
 NODE_ENV=development
 ```
@@ -89,9 +89,11 @@ The schema creates:
 
 1. Create a Gemini API key in Google AI Studio.
 2. Put the key in `backend/.env` as `GEMINI_API_KEY`.
-3. Keep `GEMINI_MODEL=gemini-3.7-flash` or change it to another compatible Gemini model.
+3. Keep `GEMINI_MODEL=gemini-3.6-flash` or change it to another compatible Gemini model.
 
 Gemini is called only from the backend.
+
+The server can boot without a Gemini key so health checks and the browser tester still load, but `POST /api/analyses` requires a real key to return an AI-generated analysis.
 
 ## Installation
 
@@ -114,6 +116,8 @@ A small browser tester is served at:
 http://localhost:5000/
 http://localhost:5000/scanner
 ```
+
+The scanner accepts a public job posting URL or a pasted job description. URL extraction is best-effort because some job boards block automated server-side fetches; the pasted description path remains available for those cases.
 
 ## Development Commands
 
@@ -143,7 +147,7 @@ See `API.md` for the full frontend contract.
 ```bash
 curl -X POST http://localhost:5000/api/analyses \
   -F "resume=@./resume.pdf" \
-  -F "jobDescription=Build and maintain Node.js APIs backed by PostgreSQL." \
+  -F "jobUrl=https://example.com/jobs/backend-developer" \
   -F "jobTitle=Junior Backend Developer" \
   -F "company=Example Company"
 ```
@@ -163,24 +167,24 @@ For PDF analysis, the backend uploads the PDF to Gemini file/document capabiliti
 
 ```text
 backend/
-├── src/
-│   ├── config/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── routes/
-│   ├── schemas/
-│   ├── services/
-│   ├── types/
-│   ├── utils/
-│   ├── app.ts
-│   └── server.ts
-├── database/
-│   └── schema.sql
-├── scripts/
-│   └── initDb.ts
-├── tests/
-├── .env.example
-├── API.md
-├── package.json
-└── tsconfig.json
+|-- src/
+|   |-- config/
+|   |-- controllers/
+|   |-- middleware/
+|   |-- routes/
+|   |-- schemas/
+|   |-- services/
+|   |-- types/
+|   |-- utils/
+|   |-- app.ts
+|   `-- server.ts
+|-- database/
+|   `-- schema.sql
+|-- scripts/
+|   `-- initDb.ts
+|-- tests/
+|-- .env.example
+|-- API.md
+|-- package.json
+`-- tsconfig.json
 ```

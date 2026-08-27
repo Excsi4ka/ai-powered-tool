@@ -32,6 +32,26 @@ type GeminiClient = {
   };
 };
 
+const GEMINI_ANALYSIS_TIMEOUT_MS = 90000;
+
+const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number, code: string, message: string): Promise<T> => {
+  let timeout: NodeJS.Timeout | undefined;
+
+  const timeoutPromise = new Promise<never>((_resolve, reject) => {
+    timeout = setTimeout(() => {
+      reject(new AppError(code, message, 503));
+    }, timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+  }
+};
+
 export interface GeminiAnalysisInput {
   resume: ProcessedResume;
   jobDescription: string;
@@ -123,9 +143,14 @@ export class GeminiService implements GeminiServiceContract {
         uploadedPdf = await this.uploadPdf(client, input.resume.filePath, input.resume.originalFilename);
       }
 
-      const outputText = client.interactions
-        ? await this.generateWithInteractions(client, prompt, uploadedPdf)
-        : await this.generateWithGenerateContent(client, prompt, uploadedPdf);
+      const outputText = await withTimeout(
+        client.interactions
+          ? this.generateWithInteractions(client, prompt, uploadedPdf)
+          : this.generateWithGenerateContent(client, prompt, uploadedPdf),
+        GEMINI_ANALYSIS_TIMEOUT_MS,
+        "GEMINI_TIMEOUT",
+        "Gemini took too long to generate the analysis. Please try again.",
+      );
 
       return parseGeminiJson(outputText);
     } catch (error) {

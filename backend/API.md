@@ -15,6 +15,8 @@ http://localhost:5000/scanner
 
 All responses use JSON. The Gemini API key is used only on the backend and is never returned to the frontend.
 
+The main scanner accepts either a public job posting URL or pasted job description text. Gemini still performs the resume-to-job comparison and returns the 0-100 compatibility grade. URL extraction is best-effort because some job boards block automated server-side fetches, so the frontend should keep pasted description as a fallback.
+
 ## CORS
 
 Allowed frontend origin comes from:
@@ -65,7 +67,8 @@ FormData fields:
 | Field | Required | Type | Notes |
 | --- | --- | --- | --- |
 | `resume` | Yes | File | PDF, DOCX, or TXT. Max 5 MB. |
-| `jobDescription` | Yes | string | Full job description text. |
+| `jobUrl` | No | string | Public HTTP/HTTPS job posting URL. Required when `jobDescription` is omitted. |
+| `jobDescription` | No | string | Full job description text. Required when `jobUrl` is omitted. |
 | `jobTitle` | No | string | Optional job title metadata. |
 | `company` | No | string | Optional company metadata. |
 
@@ -74,9 +77,12 @@ Example fetch:
 ```ts
 const formData = new FormData();
 formData.append("resume", file);
-formData.append("jobDescription", jobDescription);
-formData.append("jobTitle", jobTitle);
-formData.append("company", company);
+formData.append("jobUrl", jobUrl);
+
+// Optional fallback/override fields:
+if (jobDescription) formData.append("jobDescription", jobDescription);
+if (jobTitle) formData.append("jobTitle", jobTitle);
+if (company) formData.append("company", company);
 
 const response = await fetch("http://localhost:5000/api/analyses", {
   method: "POST",
@@ -95,6 +101,7 @@ Example success response:
     "analysisId": "11111111-1111-4111-8111-111111111111",
     "jobTitle": "Junior Backend Developer",
     "company": "Example Company",
+    "jobUrl": "https://example.com/jobs/backend-developer",
     "resumeFilename": "resume.pdf",
     "analysis": {
       "matchScore": 82,
@@ -189,8 +196,12 @@ Common error codes:
 | 400 | `MISSING_RESUME` | The `resume` FormData file is missing. |
 | 400 | `VALIDATION_ERROR` | Required fields are missing or invalid. |
 | 400 | `INVALID_FILE_TYPE` | Resume is not PDF, DOCX, or TXT. |
+| 400 | `INVALID_JOB_URL` | The job URL is invalid or points to a local/private host. |
+| 400 | `JOB_URL_FETCH_FAILED` | The backend could not fetch the job posting URL. |
+| 400 | `JOB_DESCRIPTION_NOT_FOUND` | The backend could not extract usable job text from the URL. |
 | 404 | `ANALYSIS_NOT_FOUND` | No saved analysis exists for that UUID. |
 | 413 | `FILE_TOO_LARGE` | Resume is larger than 5 MB. |
+| 413 | `JOB_URL_TOO_LARGE` | The job URL response is too large to process. |
 | 429 | `RATE_LIMIT_EXCEEDED` | Too many requests from the same client. |
 | 502 | `GEMINI_INVALID_RESPONSE` | Gemini returned data that did not match the API contract. |
 | 503 | `GEMINI_UNAVAILABLE` | Gemini was unavailable or timed out. |
@@ -254,6 +265,7 @@ export interface CreateAnalysisResponse {
     analysisId: string;
     jobTitle: string | null;
     company: string | null;
+    jobUrl: string | null;
     resumeFilename: string | null;
     analysis: JobGapAnalysis;
     createdAt: string;
@@ -266,7 +278,7 @@ export interface CreateAnalysisResponse {
 ```bash
 curl -X POST http://localhost:5000/api/analyses \
   -F "resume=@./resume.pdf" \
-  -F "jobDescription=Build and maintain Node.js APIs backed by PostgreSQL." \
+  -F "jobUrl=https://example.com/jobs/backend-developer" \
   -F "jobTitle=Junior Backend Developer" \
   -F "company=Example Company"
 ```

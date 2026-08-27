@@ -13,17 +13,8 @@ const envSchema = z
       .default("false")
       .transform((value) => value === "true"),
     GEMINI_API_KEY: z.string().optional(),
-    GEMINI_MODEL: z.string().min(1).default("gemini-3.7-flash"),
+    GEMINI_MODEL: z.string().min(1).default("gemini-3.6-flash"),
     FRONTEND_ORIGIN: z.string().min(1).default("http://localhost:3000"),
-  })
-  .superRefine((value, ctx) => {
-    if (value.NODE_ENV === "production" && !value.GEMINI_API_KEY) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["GEMINI_API_KEY"],
-        message: "GEMINI_API_KEY is required in production.",
-      });
-    }
   });
 
 const parsedEnv = envSchema.safeParse(process.env);

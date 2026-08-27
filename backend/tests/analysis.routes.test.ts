@@ -11,6 +11,7 @@ const mockAnalysis: AnalysisResponseData = {
   analysisId: "11111111-1111-4111-8111-111111111111",
   jobTitle: "Backend Developer",
   company: "Example Company",
+  jobUrl: null,
   resumeFilename: "resume.txt",
   createdAt: "2026-08-27T00:00:00.000Z",
   analysis: {
@@ -72,9 +73,55 @@ describe("analysis routes", () => {
     expect(service.createAnalysis).not.toHaveBeenCalled();
   });
 
-  it("rejects POST /api/analyses when jobDescription is missing", async () => {
+  it("rejects POST /api/analyses when jobDescription and jobUrl are missing", async () => {
     const response = await request(app)
       .post("/api/analyses")
+      .attach("resume", Buffer.from("Node.js and PostgreSQL experience."), {
+        filename: "resume.txt",
+        contentType: "text/plain",
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toMatchObject({
+      success: false,
+      error: {
+        code: "VALIDATION_ERROR",
+      },
+    });
+    expect(service.createAnalysis).not.toHaveBeenCalled();
+  });
+
+  it("accepts POST /api/analyses with jobUrl instead of jobDescription", async () => {
+    vi.mocked(service.createAnalysis).mockImplementationOnce(async (input: CreateAnalysisInput) => {
+      expect(input.jobUrl).toBe("https://example.com/jobs/backend-developer");
+      expect(input.jobDescription).toBeUndefined();
+      return {
+        ...mockAnalysis,
+        jobUrl: input.jobUrl ?? null,
+      };
+    });
+
+    const response = await request(app)
+      .post("/api/analyses")
+      .field("jobUrl", "https://example.com/jobs/backend-developer")
+      .attach("resume", Buffer.from("Node.js and PostgreSQL experience."), {
+        filename: "resume.txt",
+        contentType: "text/plain",
+      });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toMatchObject({
+      success: true,
+      data: {
+        jobUrl: "https://example.com/jobs/backend-developer",
+      },
+    });
+  });
+
+  it("rejects invalid jobUrl values", async () => {
+    const response = await request(app)
+      .post("/api/analyses")
+      .field("jobUrl", "not-a-url")
       .attach("resume", Buffer.from("Node.js and PostgreSQL experience."), {
         filename: "resume.txt",
         contentType: "text/plain",

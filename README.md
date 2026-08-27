@@ -54,6 +54,8 @@ Full frontend API contract: `backend/API.md`.
 
 A small backend-served tester is available at `http://localhost:5000/` and `http://localhost:5000/scanner`.
 
+The scanner accepts a public job posting URL or a pasted job description. URL extraction is best-effort because some job boards block automated server-side fetches; the pasted description path remains available for those cases.
+
 ## Root Convenience Scripts
 
 From the repo root:
@@ -61,6 +63,7 @@ From the repo root:
 ```bash
 npm run dev
 npm run build
+npm test
 npm start
 npm run backend:test
 npm run backend:db:setup
@@ -76,7 +79,9 @@ npm run client
 
 ## Docker deployment
 
-The Docker setup now runs the HireLens backend plus PostgreSQL. Export your Gemini key first:
+The Docker setup runs the HireLens backend plus PostgreSQL. The tester and health routes can start without a Gemini key, but `POST /api/analyses` needs a real key to complete AI analysis.
+
+For a working scanner, export your Gemini key first:
 
 ```bash
 export GEMINI_API_KEY=your_real_gemini_api_key

@@ -29,8 +29,8 @@ services:
       PORT: 5000
       DATABASE_URL: postgresql://postgres:password@postgres:5432/hirelens
       DATABASE_SSL: "false"
-      GEMINI_API_KEY: ${GEMINI_API_KEY:?GEMINI_API_KEY must be set}
-      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.7-flash}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.6-flash}
       FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000,https://jobcheck.excsi.dev}
     depends_on:
       postgres:

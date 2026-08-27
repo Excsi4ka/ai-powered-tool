@@ -1,6 +1,8 @@
 import { env } from "./config/env.js";
-import { closePool } from "./config/database.js";
+import { closePool, initializeDatabase } from "./config/database.js";
 import { createApp } from "./app.js";
+
+await initializeDatabase();
 
 const app = createApp();
 

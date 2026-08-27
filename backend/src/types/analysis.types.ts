@@ -47,6 +47,7 @@ export interface AnalysisRecord {
   id: string;
   jobTitle: string | null;
   company: string | null;
+  jobUrl: string | null;
   resumeFilename: string | null;
   matchScore: number;
   result: JobGapAnalysis;
@@ -57,6 +58,7 @@ export interface AnalysisResponseData {
   analysisId: string;
   jobTitle: string | null;
   company: string | null;
+  jobUrl: string | null;
   resumeFilename: string | null;
   analysis: JobGapAnalysis;
   createdAt: string;

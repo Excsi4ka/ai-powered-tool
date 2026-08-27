@@ -14,13 +14,34 @@ const optionalText = (max: number) =>
   );
 
 export const createAnalysisBodySchema = z.object({
-  jobDescription: z
-    .string({ error: "Job description is required." })
-    .trim()
-    .min(1, "Job description is required.")
-    .max(30000, "Job description must be 30,000 characters or fewer."),
+  jobDescription: optionalText(30000),
+  jobUrl: z.preprocess(
+    (value) => {
+      if (typeof value !== "string") {
+        return value;
+      }
+
+      const trimmed = value.trim();
+      return trimmed.length > 0 ? trimmed : undefined;
+    },
+    z
+      .url("Job URL must be a valid URL.")
+      .max(2048, "Job URL must be 2,048 characters or fewer.")
+      .refine((value) => value.startsWith("http://") || value.startsWith("https://"), {
+        message: "Job URL must use HTTP or HTTPS.",
+      })
+      .optional(),
+  ),
   jobTitle: optionalText(255),
   company: optionalText(255),
+}).superRefine((value, ctx) => {
+  if (!value.jobDescription && !value.jobUrl) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["jobDescription"],
+      message: "Provide either a job description or a job URL.",
+    });
+  }
 });
 
 export const analysisIdParamSchema = z.object({

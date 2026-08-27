@@ -15,6 +15,8 @@
     "legacy:dev": "node scripts/dev.js",
     "legacy:server": "node server/index.js",
     "legacy:server:dev": "nodemon --watch server --ext js,json --exec node server/index.js",
+    "test": "npm --prefix backend test",
+    "test:watch": "npm --prefix backend run test:watch",
     "client": "vite --host 0.0.0.0",
     "client:build": "vite build",
     "build": "npm --prefix backend run build",
