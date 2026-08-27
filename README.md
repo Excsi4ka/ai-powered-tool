@@ -23,6 +23,8 @@ npm run dev
 
 Open the React app at `http://localhost:5173`.
 
+React changes update through Vite hot reload. Express server changes restart automatically through `nodemon`.
+
 The API runs at `http://localhost:5000` and exposes:
 
 - `GET /api/hello`

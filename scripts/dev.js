@@ -12,7 +12,7 @@ function runNpmScript(scriptName) {
   return spawn('npm', ['run', scriptName], { stdio: 'inherit' });
 }
 
-const processes = [runNpmScript('server'), runNpmScript('client')];
+const processes = [runNpmScript('server:dev'), runNpmScript('client')];
 
 let shuttingDown = false;
 
