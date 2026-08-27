@@ -43,3 +43,25 @@ Start Express, which serves the built React files and API:
 ```bash
 npm start
 ```
+
+## Docker deployment
+
+The Docker image builds the React client into `dist` and packages it with the
+Express server and production Node.js dependencies. Vite is not run in the
+production container.
+
+Build and start the application:
+
+```bash
+docker compose up --build -d
+```
+
+Open `http://localhost:5000`. The API health check is available at
+`http://localhost:5000/api/health`.
+
+To view container logs or stop the deployment:
+
+```bash
+docker compose logs -f app
+docker compose down
+```
