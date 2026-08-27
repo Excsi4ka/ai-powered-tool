@@ -1,28 +1,28 @@
-# Build the React client into static files that Express can serve.
+# Build the HireLens AI backend.
 FROM node:20-alpine AS build
 
-WORKDIR /app
+WORKDIR /app/backend
 
-COPY package.json package-lock.json ./
+COPY backend/package.json backend/package-lock.json ./
 RUN npm ci
 
-COPY client ./client
-COPY vite.config.js ./
+COPY backend ./
 RUN npm run build
 
-# Run only the Express server and production dependencies.
+# Run only the backend and production dependencies.
 FROM node:20-alpine AS production
 
-WORKDIR /app
+WORKDIR /app/backend
 
 ENV NODE_ENV=production
 ENV PORT=5000
 
-COPY package.json package-lock.json ./
+COPY backend/package.json backend/package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
-COPY server ./server
-COPY --from=build /app/dist ./dist
+COPY backend/public ./public
+COPY backend/database ./database
+COPY --from=build /app/backend/dist ./dist
 
 EXPOSE 5000
 
